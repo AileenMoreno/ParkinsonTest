@@ -1,0 +1,343 @@
+<!DOCTYPE html>
+<html>
+  <head>
+    <title>Acceleration Example</title>
+    <link rel="stylesheet" type="text/css" href="css/speedTestDesign.css" media="screen" />
+    <script type="text/javascript" charset="utf-8" src="cordova.js"></script>
+    <script type="text/javascript" charset="utf-8">
+
+	    // The watch id references the current `watchAcceleration`
+	    var watchID = null;
+		
+		var htmlstring = '';
+	    
+	    // Variable utilizada para obtener la hora y dia actual
+	    var globalization = navigator.globalization;
+	    
+	    var db;
+	    var date;
+	    
+	    // Arrays que almacenan los resultados de la medicion
+	    var acc_x = new Array();
+		var acc_y = new Array();
+		var acc_z = new Array();
+		
+		// Promedios de las aceleraciones
+		var prom_x = 0;
+		var prom_y = 0;
+		var prom_z = 0;
+		
+		// variable para almacenar el ultimo tipo de medicion
+		var tipo_med = 3 //
+		
+		 // Wait for PhoneGap to load
+	    //
+	    document.addEventListener("deviceready", onDeviceReady, false);
+
+		function calcularPromedios(){
+		   	var len = acc_x.length;
+		   	var i = 0;
+		   	var sum_x = 0;
+		   	var sum_y = 0;
+		   	var sum_z = 0;
+		   	alert(len);
+		   	for (i=0;i<len;i++){
+		   		sum_x = sum_x + acc_x[i];
+		   		sum_y = sum_y + acc_y[i];
+		   		sum_z = sum_z + acc_z[i];
+		   	}
+	   		prom_x = sum_x / len;
+	   		prom_y = sum_y / len;
+	   		prom_z = sum_z / len;
+	   }
+
+	   function onDeviceReady(){
+			var start = document.getElementById("buttonStart");
+			start.style.display = "block";
+			//iniciamos la bd
+			db = window.openDatabase("Database","1.0 ","Cordova demo",2*1024*1024);
+			db.transaction(createDB,errorDB,successDB);
+	    }
+	    
+	    
+	    function startTest(){
+			var start = document.getElementById("buttonStart");
+			var text = document.getElementById("testInstruction");			
+			
+			start.style.display = "none";
+			text.style.display  = "none";	
+			
+			getReady();
+	    }
+	    
+	    function getReady(){
+	    	var element = document.getElementById('empty');	  
+	        element.innerHTML = '<center>' +
+					'<br><br><br><img src="images/getReady-es.png"></img>'+'</center><br><br>'; 
+					 
+			// Esto es para medir el tiempo del test,1 seg.
+			setTimeout("showThree()",1000);  	    
+	    
+	    }
+	    
+	    function createDB(tx){
+	    	//tx.executeSql('DROP TABLE IF EXISTS VALORES');
+	    	//tx.executeSql('DROP TABLE IF EXISTS MEDICION');
+	    	tx.executeSql('CREATE TABLE IF NOT EXISTS MEDICION(id unique,fecha,tipo,px,py,pz)');
+	    	tx.executeSql('CREATE TABLE IF NOT EXISTS VALORES(id_medicion,x,y,z)');
+	    } 
+
+		function errorDB(err){
+			alert('Error processing SQL: '+err.code);
+		}
+		
+		function successDB(){
+		}
+
+		function gotFS(fileSystem) {
+			var FILENAME = 'resultsParkinsonTest'+'.txt';
+			
+        	fileSystem.root.getFile(FILENAME, {create: true, exclusive: false}, gotFileEntry, fail);
+    	}
+
+    	function gotFileEntry(fileEntry) {
+        	fileEntry.createWriter(gotFileWriter, fail);
+    	}
+		
+		function gotFileWriter(writer) {
+           writer.write(htmlstring);
+     	}
+
+	    function fail(error) {
+	        console.log(error.code);
+	    }
+	    
+	    function showOne(){
+	    	var element = document.getElementById('empty');	    
+	        element.innerHTML = '<center>' +
+					'<br><br><br><img src="images/one.png"></img>'+'</center><br><br>';    
+			// Esto es para medir el tiempo del test,1 seg.
+			setTimeout("showGo()",1000);  	    
+	    
+	    }	    
+	    
+	    function showTwo(){
+	    	var element = document.getElementById('empty');		
+	        element.innerHTML = '<center>' +
+					'<br><br><br><img src="images/two.png"></img>'+'</center><br><br>';     
+			// Esto es para medir el tiempo del test,1 seg.
+			setTimeout("showOne()",1000);  	    
+	    
+	    }
+	    
+	    function showThree(){
+	    	var element = document.getElementById('empty');		    
+	        element.innerHTML = '<center>' +
+					'<br><br><br><img src="images/three.png"></img>'+'</center><br><br>'; 	    
+			// Esto es para medir el tiempo del test,1 seg.
+			setTimeout("showTwo()",1000);  	    
+	    
+	    }		 
+
+	    function showGo(){
+	    
+	    	var element = document.getElementById('empty'); 
+	        element.innerHTML = '<center>' +
+					'<br><br><br><img src="images/go-es.png"></img>'+'</center><br><br>';
+					 	   			
+			navigator.notification.vibrate(500);  
+			navigator.notification.beep(2);	
+			
+			var empty = document.getElementById("empty");	    
+			
+			empty.style.display  = "none";	
+					
+			
+			// Esto es para medir el tiempo del test,30 seg.
+			setTimeout("showResults()",1000); 			    			 			
+	    }	
+	    
+	    
+	    //Hay que crear una especie de contador
+	    function showResults(){			
+			var empty = document.getElementById("empty");	    
+			
+			empty.style.display  = "block";	
+			
+			
+	    	// Update acceleration every 3 seconds
+			var options = { frequency: 500 };
+			watchID = navigator.accelerometer.watchAcceleration(onSuccess, onError, options);
+	    
+	    }
+	    
+	     // Stop watching the acceleration
+	    //
+	    function stopWatch() {
+	    var element = document.getElementById('empty');
+	        if (watchID) {
+	            navigator.accelerometer.clearWatch(watchID);
+	            watchID = null;
+		        element.innerHTML = '<div class="testInstruction"><br><br><br><br><center><h1>Prueba Finalizada</h1></center></div>';
+				navigator.notification.vibrate(500); 		        
+				navigator.notification.beep(1);	 
+				
+				calcularPromedios();
+				
+				db.transaction(insertDB,errorDB);
+				// Inicia el proceso de escritura
+				//window.requestFileSystem(LocalFileSystem.PERSISTENT, 0, gotFS, fail);	 
+				showConfirm();         
+	        }
+	        
+	    }
+	    
+	    // onSuccess: Get a snapshot of the current acceleration
+	    //
+	    function onSuccess(acceleration) {
+	    
+	    	// Esto es para medir el tiempo del test,30 seg.
+			setTimeout("stopWatch()",30000);
+
+	        var element = document.getElementById('empty');
+	        element.innerHTML = '<div class="showAcceleration"><center><h1>Aceleracion</h1>' +
+	        					'<h3>Debes mantener la posicion por 20 segundos</h3><br>'+
+	        					'X :   ' + acceleration.x + '<br><br>' +
+	                            ' Y :   ' + acceleration.y + '<br><br>' +
+	                            ' Z :   ' + acceleration.z + '<br><br>' +
+	                            '</center></div>';
+	       acc_x.push(acceleration.x);
+			acc_y.push(acceleration.y);
+			acc_z.push(acceleration.z);
+	    }
+
+		// onError: Failed to get the acceleration
+		//
+		function onError() {
+		    alert('onError!');
+		}
+
+		// Funcion que inserta en la base de datos la medicion obtenida
+	    function insertDB(tx){
+	    	var len = acc_x.length;
+	    	var sql ;
+	    	var i = 0;	
+	    	
+	    	date = new Date();
+			
+	    	
+	    	// Insertamos en la tabla de medicion
+	    	sql= 'INSERT INTO MEDICION(id,fecha,tipo,px,py,pz) VALUES (?,?,?,?,?,?)';
+	    	tx.executeSql(sql,[date.toTimeString(),date.toDateString(),tipo_med,prom_x,prom_y,prom_z],successQueryDB2,errorDB);
+	    	
+	    	for (i = 0;i<len;i++){
+	    		sql= 'INSERT INTO VALORES(id_medicion,x,y,z) VALUES (?,?,?,?)';
+	    		tx.executeSql(sql,[date.toTimeString(),acc_x[i],acc_y[i],acc_z[i]],successQueryDB,errorDB);
+	    	}	
+	    }
+	    
+	    
+	    function successQueryDB2(tx){
+	  		// Esto muestra los valores
+	    	tx.executeSql('SELECT * FROM MEDICION',[],renderList2,errorDB);
+	    	
+	    }
+	    
+	    // Funcion que muestra si agrego correctamente
+	    function successQueryDB(tx){
+	  		// Esto muestra los valores
+	    	tx.executeSql('SELECT * FROM VALORES',[],renderList,errorDB);
+	    	
+	    }
+	    
+	     // Funcion que muestra los resultados
+	    function renderList2(tx,results){
+	    	var i;
+	    	 var element = document.getElementById('accelerometer');
+	    	htmlstring = '';
+	    	var len = results.rows.length;
+	    	
+	    	for (i = 0;i<len;i++){
+	    		htmlstring += '<li>' + results.rows.item(i).id + '</li>';
+	    	}
+	    	//element.innerHTML = '<ul>' + htmlstring +'</ul>';
+	    }
+	    
+	    // Funcion que muestra los resultados
+	    function renderList(tx,results){
+	    	var i;
+	    	 var element = document.getElementById('resultadoTest');
+	    	htmlstring = '';
+	    	var len = results.rows.length;
+	    	
+	    	for (i = 0;i<len;i++){
+	    		htmlstring += '%0D%0AX:' + results.rows.item(i).x + '%0D%0AY:' + results.rows.item(i).y+'%0D%0AZ:' + results.rows.item(i).z + '%0D%0A%0D%0A ';
+	    	}
+	    	//element.innerHTML = '<ul>' + htmlstring +'</ul>';
+	    }
+
+		
+		
+    //
+    function showConfirm() {
+        navigator.notification.confirm(
+    	'¿Deseas enviar los resultados ahora?',      // mensaje (message)
+    	onConfirm,      // función 'callback' a llamar con el índice del botón pulsado (confirmCallback)
+    	'Parkinson Test',            // titulo (title)
+        'Cancelar,Aceptar'          // botones (buttonLabels)
+        );
+    }
+    
+		// procesa el resultado del cuadro de confirmación
+	    function onConfirm(button) {
+	        
+	        if (button==1){
+	        	window.location='index.html';
+	        }else{
+	        	var email='proyectoparkinson@gmail.com';
+				var subject = 'ParkinsonTest-Resultados';
+				var cc = 'aileengmp@gmail.com';
+				var body = 'Resultados de examen sobre brazos al frente %0D%0A-Date: '+date.toTimeString()+'%0D%0A-Promedio x:'+prom_x+'%0D%0A%0D%0A-Promedio y:'+prom_y+'%0D%0A%0D%0A -Promedio z:'+prom_z+'%0D%0A %0D%0A-Valores: %0D%0A'+htmlstring;
+				var mailto_link = 'mailto:' + email+'?subject=ParkinsonTest&cc='+cc+'&body=' +body;
+				window.location= mailto_link;
+	        }
+	    }
+		
+    </script>
+    
+  </head>
+  <body>
+  
+  	<div class="mainBannerName">
+		<center>
+		<img src="images/nameBanner.fw.png" width="300" height="55"></img>
+		</center>
+	</div>
+	
+	<div class="testMenu">
+		<center>
+		
+			<div class="testInstruction" id="testInstruction">
+				<div class="subtitle"><br><center>Brazos al frente</center><br></div>
+				<div class="bloque">
+				Esta prueba ha sido creada para medir la cantidad de temblor en estado de resposo.
+				Debe mantener los brazos elevados y hacia el frente por 30 seg.
+				 </div>
+				 
+				 <center>
+					<br>
+					<img src="images/frontArms.png" width="120" height="80"></img>
+					<br>
+				</center>
+				 
+			</div>
+				
+			
+			<button  id="buttonStart" class="testButton" onclick="startTest()";>Comenzar</button>
+			<div id="empty"></div>		
+			
+		</center>
+   	</div>
+		
+  </body>
+</html>

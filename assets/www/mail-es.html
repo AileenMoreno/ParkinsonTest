@@ -1,0 +1,184 @@
+<!DOCTYPE html>
+<html>
+  <head>
+    <title>Acceleration Example</title>
+    <link rel="stylesheet" type="text/css" href="css/speedTestDesign.css" media="screen" />
+    <link rel="stylesheet" href="http://code.jquery.com/mobile/1.4.2/jquery.mobile-1.4.2.min.css">
+	<script src="http://code.jquery.com/jquery-1.10.2.min.js"></script>
+	<script src="http://code.jquery.com/mobile/1.4.2/jquery.mobile-1.4.2.min.js"></script>
+     <script type="text/javascript" charset="utf-8" src="cordova.js"></script>
+    <script type="text/javascript" charset="utf-8">
+
+		// Wait for PhoneGap to load
+	    document.addEventListener("deviceready", onDeviceReady, false);
+
+	   function onDeviceReady(){
+			
+			//iniciamos la bd
+			var db = window.openDatabase("Database","1.0 ","Cordova demo",30*1024*1024);
+			db.transaction(createDB,errorDB,successDB);
+			iniciar();
+	    }
+
+	    // The watch id references the current `watchAcceleration`
+	    var watchID = null;
+		var selected_index = -1;
+		var ids = new Array();
+		var fechas = new Array();
+		var tipos = new Array();
+		var pxs = new Array();
+		var pys = new Array();
+		var pzs = new Array();
+		
+		var htmlstring = '';
+	    
+		
+		function iniciar(){
+			//alert('alo');
+		}
+	    
+	    function onBodyLoad(){
+	    	//alert('alo0');
+	    }
+	    
+	    function createDB(tx){
+	    	//tx.executeSql('DROP TABLE IF EXISTS VALORES');
+	    	// tx.executeSql('DROP TABLE IF EXISTS MEDICION');
+	    	 tx.executeSql('CREATE TABLE IF NOT EXISTS MEDICION(id unique,fecha,tipo,px,py,pz)'); 
+	    	 tx.executeSql('CREATE TABLE IF NOT EXISTS VALORES(id_medicion,x,y,z)');
+	    } 
+
+		function queryDB(tx){
+			tx.executeSql('SELECT * FROM MEDICION',[],renderList2,errorOtro);
+		}
+		
+		function query2DB(tx){
+			var idMed = ids[selected_index];
+			// En este caso no hay que buscar los valores
+			if ( (tipos[selected_index]==4) || (tipos[selected_index]==5) ){
+				var email='proyectoparkinson@gmail.com';
+				var subject = 'ParkinsonTest-Results';
+				var cc = 'aileengmp@gmail.com';
+				var body = 'Resultados de examen%0D%0A-Fecha: '+idMed+'%0D%0A-Puntaje:'+pxs[selected_index];
+				var mailto_link = 'mailto:' + email+'?subject=ParkinsonTest&cc='+cc+'&body=' +body;
+				window.location= mailto_link;
+			}else{
+				
+				tx.executeSql('SELECT * FROM VALORES WHERE id_medicion="'+ idMed+ '"',[],renderList,errorDB);
+			}
+			
+		}
+
+		// Funcion que muestra los resultados
+	    function renderList(tx,results){
+	    	var i;
+	    	
+	    	htmlstring = '';
+	    	var len = results.rows.length;
+	    	
+	    	for (i = 0;i<len;i++){
+	    		htmlstring += '%0D%0AX:' + results.rows.item(i).x + '%0D%0AY:' + results.rows.item(i).y+'%0D%0AZ:' + results.rows.item(i).z + '%0D%0A%0D%0A ';
+	    	}
+	    
+	    	var email='proyectoparkinson@gmail.com';
+			var subject = 'ParkinsonTest-Results';
+			var cc = 'aileengmp@gmail.com';
+			var body = 'Resultados  %0D%0A-Fecha: '+ids[selected_index]+'%0D%0A-Promedio x:'+pxs[selected_index]+'%0D%0A%0D%0A-Promedio y:'+pys[selected_index]+'%0D%0A%0D%0A -Promedio z:'+pzs[selected_index]+'%0D%0A %0D%0A-Valores: %0D%0A'+htmlstring;
+			var mailto_link = 'mailto:' + email+'?subject=ParkinsonTest&cc='+cc+'&body=' +body;
+			window.location= mailto_link;
+	    	
+	    }
+
+		function renderList2(tx,results){
+	    	var i;
+	    	console.log("Rows Affected = " + results.rowAffected);
+	    	 var element = document.getElementById('listaMediciones');
+	    	htmlstring = '';
+	    	var len = results.rows.length;
+	    	
+	    	for (i = 0;i<len;i++){
+	    		var tipo = results.rows.item(i).tipo;
+	    		// almacenamos en los arreglos 
+	    		
+	    		ids.push(results.rows.item(i).id);
+	    		fechas.push(results.rows.item(i).fecha);
+	    		tipos.push(results.rows.item(i).tipo);
+	    		pxs.push(results.rows.item(i).px);
+	    		pys.push(results.rows.item(i).py);
+	    		pzs.push(results.rows.item(i).pz);
+	    		
+	    		htmlstring = 'ID: '+results.rows.item(i).id.substring(0,9);
+	    		if (tipo==1){
+	    			htmlstring += ' | Tipo: Pruebate';
+	    		}
+	    		if (tipo==2){
+	    			htmlstring += ' | Tipo: Brazos Flexionados';
+	    		}
+	    		if (tipo==3){
+	    			htmlstring += ' | Tipo: Brazos al frente';
+	    		}
+	    		if (tipo==4){
+	    			htmlstring += ' | Tipo: Prueba Precision';
+	    		}
+	    		
+	    		if (tipo==5){
+	    			htmlstring += ' | Tipo: Prueba Rapidez';
+	    		}
+	    		
+	    		$('ul').append($('<li/>', {'data-role': "listview"}).append($('<a/>', {'href': '','text': htmlstring})));
+				$('ul').listview('refresh');
+	    	}
+	    	
+	    	$('ul').children('li').on('click', function () {
+			    selected_index = $(this).index();
+			    
+			    var db1 = window.openDatabase("Database","1.0 ","Cordova demo",30*1024*1024);
+        		db1.transaction(query2DB, errorSUCCESS);	
+			    
+			});
+	    	$('ul').listview('refresh');
+	    }
+	    
+	    
+
+		function errorDB(err){
+			alert('Error processing SQL: why'+err.code);
+		}
+		
+		function errorOtro(err){
+			alert('Error processing SQL SELECT: '+err.code);
+		}
+		
+		function errorSUCCESS(err){
+			alert('Error processing SQL: SUCCESSDB '+err.code);
+		}
+		
+		function successDB(tx){
+			var db = window.openDatabase("Database","1.0 ","Cordova demo",30*1024*1024);
+        	db.transaction(queryDB, errorSUCCESS);	
+		}
+
+		
+		
+    </script>
+    
+  </head>
+  <body >
+  
+  	<div class="mainBannerName">
+		<center>
+		<img src="images/nameBanner.fw.png" width="300" height="55"></img>
+		</center>
+	</div>
+	<div class="testMenu">
+		<center>
+			<ul data-role="listview">
+			</ul>
+			
+			
+			
+		</center>
+   	</div>
+		
+  </body>
+</html>

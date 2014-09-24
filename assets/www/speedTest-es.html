@@ -1,0 +1,244 @@
+<!DOCTYPE html>
+<html>
+  <head>
+    <title>Acceleration Example</title>
+    <link rel="stylesheet" type="text/css" href="css/speedTestDesign.css" media="screen" />
+    <script type="text/javascript" charset="utf-8" src="cordova.js"></script>
+    <script type="text/javascript" charset="utf-8">
+
+	    // The watch id references the current `watchAcceleration`
+	    var watchID = null;
+		var countPress = 0;	
+		
+		 var db;
+	    var date;
+	  
+		// variable para almacenar el ultimo tipo de medicion
+		var tipo_med = 5;
+		 
+		 // Wait for PhoneGap to load
+	   
+	    document.addEventListener("deviceready", onDeviceReady, false);
+
+	   function onDeviceReady(){
+			var start = document.getElementById("buttonStart");
+			var speed = document.getElementById("speed");
+			start.style.display = "block";
+			speed.style.display = "none";
+	    
+	    	//iniciamos la bd
+			db = window.openDatabase("Database","1.0 ","Cordova demo",2*1024*1024);
+			db.transaction(createDB,errorDB,successDB);	
+	    }
+	    
+	    
+	    function startTest(){
+			var start = document.getElementById("buttonStart");
+			var text = document.getElementById("testInstruction");			
+			var speed = document.getElementById("speed");
+			start.style.display = "none";
+			text.style.display  = "none";	
+			speed.style.display = "none";	 
+			getReady();
+	    }
+	    
+	    function getReady(){
+	    	var element = document.getElementById('empty');	  
+	        element.innerHTML = '<center>' +
+					'<br><br><br><img src="images/getReady-es.png"></img>'+'</center><br><br>'; 
+					 
+			// Esto es para medir el tiempo del test,5 seg.
+			setTimeout("showOne()",1000);  	    
+	    
+	    }
+	    
+	    function showOne(){
+	    	var element = document.getElementById('empty');	    
+	        element.innerHTML = '<center>' +
+					'<br><br><br><img src="images/one.png"></img>'+'</center><br><br>';    
+			// Esto es para medir el tiempo del test,5 seg.
+			setTimeout("showTwo()",1000);  	    
+	    
+	    }	    
+	    
+	    function showTwo(){
+	    	var element = document.getElementById('empty');		
+	        element.innerHTML = '<center>' +
+					'<br><br><br><img src="images/two.png"></img>'+'</center><br><br>';     
+			// Esto es para medir el tiempo del test,5 seg.
+			setTimeout("showThree()",1000);  	    
+	    
+	    }
+	    
+	    function showThree(){
+	    	var element = document.getElementById('empty');		    
+	        element.innerHTML = '<center>' +
+					'<br><br><br><img src="images/three.png"></img>'+'</center><br><br>'; 	    
+			// Esto es para medir el tiempo del test,5 seg.
+			setTimeout("showGo()",1000);  	    
+	    
+	    }		 
+
+	    function showGo(){
+	    
+	    	var element = document.getElementById('empty'); 
+	        element.innerHTML = '<center>' +
+					'<br><br><br><img src="images/go-es.png"></img>'+'</center><br><br>';
+					 	   			
+			navigator.notification.vibrate(500);  
+			navigator.notification.beep(2);	
+			
+			var empty = document.getElementById("empty");	    
+			var speed = document.getElementById("speed");
+			empty.style.display  = "none";	
+			speed.style.display = "block";				
+			
+			// Esto es para medir el tiempo del test,30 seg.
+			setTimeout("showResults()",30000); 			    			 			
+	    }	
+	    
+	    
+	    //Hay que crear una especie de contador
+	    function showResults(){			
+			var empty = document.getElementById("empty");	    
+			var speed = document.getElementById("speed");
+			empty.style.display  = "block";	
+			speed.style.display = "none";	
+			
+	    	var element = document.getElementById('empty'); 
+	        element.innerHTML = '<div class="testInstruction"><center><h1>Puntaje : </h1><br><br><br><h1>'+countPress+'</h1></center></div><br><br>';			
+	    
+	    	db.transaction(insertDB,errorDB);
+			showConfirm();
+	    }
+
+	
+		
+		function createDB(tx){
+	    	//tx.executeSql('DROP TABLE IF EXISTS VALORES');
+	    	//tx.executeSql('DROP TABLE IF EXISTS MEDICION');
+	    	tx.executeSql('CREATE TABLE IF NOT EXISTS MEDICION(id unique,fecha,tipo,px,py,pz)');
+	    	
+	    } 
+
+		function errorDB(err){
+			alert('Error processing SQL: '+err.code);
+		}
+		
+		function successDB(){
+		}
+
+		function gotFS(fileSystem) {
+			var FILENAME = 'resultsParkinsonTest'+'.txt';
+			
+        	fileSystem.root.getFile(FILENAME, {create: true, exclusive: false}, gotFileEntry, fail);
+    	}
+
+    	function gotFileEntry(fileEntry) {
+        	fileEntry.createWriter(gotFileWriter, fail);
+    	}
+		
+		function gotFileWriter(writer) {
+           writer.write(htmlstring);
+     	}
+
+	    function fail(error) {
+	        console.log(error.code);
+	    }
+	    
+	    // Funcion que inserta en la base de datos la medicion obtenida
+	    function insertDB(tx){
+	 
+	    	var sql ;
+	    	date = new Date();
+			
+	    	
+	    	// Insertamos en la tabla de medicion
+	    	sql= 'INSERT INTO MEDICION(id,fecha,tipo,px,py,pz) VALUES (?,?,?,?,?,?)';
+	    	tx.executeSql(sql,[date.toTimeString(),date.toDateString(),tipo_med,countPress,"0","0"],successQueryDB2,errorDB);
+	    	
+	    		
+	    }
+	    
+	    
+	    function successQueryDB2(tx){
+	  		// Esto muestra los valores
+	    	//tx.executeSql('SELECT * FROM MEDICION',[],renderList2,errorDB);
+	    	
+	    }
+	    
+	 
+	    
+	     // Funcion que muestra los resultados
+	    function renderList2(tx,results){
+	    	//var i;
+	    	//htmlstring += '%0D%0AX Press Count:' + countPress + '%0D%0AX';
+	    }
+		
+		function presser(){
+		
+			countPress = countPress + 1;
+		}
+		
+		// Muestra un cuadro de confirmación personalizado
+    //
+    function showConfirm() {
+        navigator.notification.confirm(
+    	'¿Deseas enviar los resultados ahora?',      // mensaje (message)
+    	onConfirm,      // función 'callback' a llamar con el índice del botón pulsado (confirmCallback)
+    	'Parkinson Test',            // titulo (title)
+        'Cancelar,Aceptar'          // botones (buttonLabels)
+        );
+    }
+    
+		// procesa el resultado del cuadro de confirmación
+	    function onConfirm(button) {
+	        
+	        if (button==1){
+	        	window.location='index.html';
+	        }else{
+	        	var email='proyectoparkinson@gmail.com';
+				var subject = 'ParkinsonTest-Resultados';
+				var cc = 'aileengmp@gmail.com';
+				var body = 'Resultados Prueba Rapidez %0D%0A-Fecha: '+date.toTimeString()+'%0D%0A-Puntaje :'+countPress;
+				var mailto_link = 'mailto:' + email+'?subject=ParkinsonTest&cc='+cc+'&body=' +body;
+				window.location= mailto_link;
+	        }
+	    }
+		
+    </script>
+    
+  </head>
+  <body>
+  
+  	<div class="mainBannerName">
+		<center>
+		<img src="images/nameBanner.fw.png" width="300" height="55"></img>
+		</center>
+	</div>
+	
+	<div class="testMenu">
+		<center>
+			<div class="testInstruction" id="testInstruction">
+				<center>
+				<div class="subtitle"><br><center>Examen de rapidez</center><br></div>
+					<div class="bloque">
+					
+						Esta prueba ha sido creada para probar su rapirez, debe presionar
+						el boton tantas veces como pueda durante 30 segundos<br> Buena Suerte!
+					 </div>
+					 </center>
+				 <br>				
+			</div>
+				
+			<br>
+			<button  id="buttonStart" class="testButton" onclick="startTest()";>Comenzar</button><br>
+			<div id="empty"></div>		
+			<div id="speed">
+				<button  id="buttonSpeed" class="testButton" onclick="presser()";> Presiona Aqui </button>
+			</div>
+		</center>
+   	</div>
+		
+  </body>
+</html>

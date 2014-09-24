@@ -1,0 +1,136 @@
+body
+{
+	background-color:#EFEFEF;
+	margin:0px;
+	padding:0px;
+	width:100%;
+}
+
+.mainBannerName
+{
+	 border-bottom:medium solid #4DBAE9;
+}
+
+.mainBannerName table
+{
+	 margin:0px;
+	 padding:0px;
+	 width:100%;
+}
+
+.mainBannerName h1
+{
+ font-style:normal;
+ color:#4DBAE9
+}
+
+table.mainMenu{
+	width:100%;
+}
+	
+
+table.mainMenu td{
+
+	padding-top:4px;
+}
+
+table.submainMenu {
+	text-align:center;
+	width:120px;
+}
+
+.subtitleMenu{
+	 vertical-align:top;
+	 text-align:center;
+	 font-weight:bold;
+	 font-style:normal;
+	 color:#4DBAE9
+}
+
+p{text-align:justify;}
+
+.subtitle{
+	width:350;
+	color:#4dbae9;
+	font-family:Comic Sans MS;
+	font-size:22px;
+	font-weight:bold;
+	font-style:normal;
+	text-shadow:1px 1px 0px #d2d7d9;
+	text-align:justify;
+}
+
+
+.bloque {
+
+	width:75%;
+	color:#4dbae9;
+	font-family:Comic Sans MS;
+	font-size:15px;
+	font-weight:bold;
+	font-style:normal;
+	text-shadow:1px 1px 0px #d2d7d9;
+	text-align:justify;
+
+}	
+
+
+.bloque2 {
+
+	width:85%;
+	color:#4dbae9;
+	font-family:Comic Sans MS;
+	font-size:90%;
+	font-weight:bold;
+	font-style:normal;
+	text-shadow:1px 1px 0px #d2d7d9;
+	text-align:justify;
+
+}	
+
+.testButton {
+	-moz-box-shadow:inset 0px 1px 0px 0px #d4d3d2;
+	-webkit-box-shadow:inset 0px 1px 0px 0px #d4d3d2;
+	box-shadow:inset 0px 1px 0px 0px #d4d3d2;
+	background:-webkit-gradient( linear, left top, left bottom, color-stop(0.05, #77b9d1), color-stop(1, #4dbae9) );
+	background:-moz-linear-gradient( center top, #77b9d1 5%, #4dbae9 100% );
+	filter:progid:DXImageTransform.Microsoft.gradient(startColorstr='#77b9d1', endColorstr='#4dbae9');
+	background-color:#68c4e6;
+	-webkit-border-top-left-radius:20px;
+	-moz-border-radius-topleft:20px;
+	border-top-left-radius:20px;
+	-webkit-border-top-right-radius:20px;
+	-moz-border-radius-topright:20px;
+	border-top-right-radius:20px;
+	-webkit-border-bottom-right-radius:20px;
+	-moz-border-radius-bottomright:20px;
+	border-bottom-right-radius:20px;
+	-webkit-border-bottom-left-radius:20px;
+	-moz-border-radius-bottomleft:20px;
+	border-bottom-left-radius:20px;
+	text-indent:0;
+	border:1px solid #4dbae9;
+	display:inline-block;
+	color:#ffffff;
+	font-family:Comic Sans MS;
+	font-size:15px;
+	font-weight:bold;
+	font-style:normal;
+	height:65px;
+	line-height:65px;
+	width:154px;
+	text-decoration:none;
+	text-align:center;
+	text-shadow:1px 1px 0px #48aad4;
+}
+.testButton:hover {
+	background:-webkit-gradient( linear, left top, left bottom, color-stop(0.05, #4dbae9), color-stop(1, #77b9d1) );
+	background:-moz-linear-gradient( center top, #4dbae9 5%, #77b9d1 100% );
+	filter:progid:DXImageTransform.Microsoft.gradient(startColorstr='#4dbae9', endColorstr='#77b9d1');
+	background-color:#4dbae9;
+		color:#ffffff;
+}.testButton:active {
+	position:relative;
+	top:1px;
+		color:#ffffff;
+}

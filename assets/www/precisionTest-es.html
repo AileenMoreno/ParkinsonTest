@@ -1,0 +1,278 @@
+<!DOCTYPE html>
+<html>
+  <head>
+    <title>Acceleration Example</title>
+    <link rel="stylesheet" type="text/css" href="css/precisionTestDesign.css" media="screen" />
+    <script type="text/javascript" charset="utf-8" src="cordova.js"></script>
+    <script type="text/javascript" charset="utf-8">
+
+	    // The watch id references the current `watchAcceleration`
+	    var watchID = null;
+	    
+	    // Global var
+	    var activeSquare = 0;
+	    var countPoints = 0;
+	    
+	    var db;
+	    var date;
+	  
+		// variable para almacenar el ultimo tipo de medicion
+		var tipo_med = 4 ;// 
+	
+	    // Wait for PhoneGap to load
+	    document.addEventListener("deviceready", onDeviceReady, false);
+
+	   function onDeviceReady(){
+			var start = document.getElementById("buttonStart");
+			var table = document.getElementById("boardTest");			
+			start.style.visibility = "visible";
+			table.style.visibility = "hidden";
+	    	
+	    	//iniciamos la bd
+			db = window.openDatabase("Database","1.0 ","Cordova demo",2*1024*1024);
+			db.transaction(createDB,errorDB,successDB);
+	    }
+
+	    function startTest(){
+			var start = document.getElementById("buttonStart");
+			var text = document.getElementById("testInstruction");	
+			var table = document.getElementById("boardTest");			
+			start.style.display = "none";
+			text.style.display = "none";
+			start.style.visibility = "hidden";
+			text.style.visibility = "hidden";
+			table.style.visibility = "visible";
+			// Esto es para medir el tiempo del test,60 seg.
+			setTimeout("showResults()",10000); 							
+			mainProcedure();
+	    }	   
+	    
+	    function mainProcedure(){
+
+				var c1 = document.getElementById("c11");	
+				var c2 = document.getElementById("c12");	
+				var c3 = document.getElementById("c13");	
+				var c4 = document.getElementById("c21");	
+				var c5 = document.getElementById("c22");	
+				var c6 = document.getElementById("c23");	
+				var c7 = document.getElementById("c31");	
+				var c8 = document.getElementById("c32");	
+				var c9 = document.getElementById("c33");	
+				  
+			c1.innerHTML = '<div class="greyX">X</div>';
+			c2.innerHTML = '<div class="greyX">X</div>';
+			c3.innerHTML = '<div class="greyX">X</div>';
+			c4.innerHTML = '<div class="greyX">X</div>';
+			c5.innerHTML = '<div class="greyX">X</div>';
+			c6.innerHTML = '<div class="greyX">X</div>';
+			c7.innerHTML = '<div class="greyX">X</div>';
+			c8.innerHTML = '<div class="greyX">X</div>';
+			c9.innerHTML = '<div class="greyX">X</div>';	       	
+	    
+			//Random function to show the right square, between 1 and 9		
+			var x = Math.floor(( Math.random() * 9) + 1);
+			randomCondition(x);											
+	    }
+	   	    
+	    //Given the number, show the right square
+	    function randomCondition(x){			
+			if (x==1){
+				var c = document.getElementById("c11");	
+	        	c.innerHTML = '<div class="blueX">X</div>'; 				
+				c.style.visibility = "visible";
+				activeSquare = 1;	
+			}else if(x==2){
+				var c = document.getElementById("c12");		
+				c.innerHTML = '<div class="blueX">X</div>'; 
+				c.style.visibility = "visible";
+				activeSquare = 2;			
+			}else if(x==3){
+				var c = document.getElementById("c13");	
+	        	c.innerHTML = '<div class="blueX">X</div>'; 
+				c.style.visibility = "visible";
+				activeSquare = 3;		
+			}else if(x==4){
+				var c = document.getElementById("c21");	
+	        	c.innerHTML = '<div class="blueX">X</div>'; 				
+				c.style.visibility = "visible";
+				activeSquare = 4;			
+			}else if(x==5){
+				
+				var c = document.getElementById("c22");		
+	        	c.innerHTML = '<div class="blueX">X</div>'; 				
+				c.style.visibility = "visible";
+				activeSquare = 5;			
+			}else if(x==6){
+				
+				var c = document.getElementById("c23");		
+	        	c.innerHTML = '<div class="blueX">X</div>'; 				
+				c.style.visibility = "visible";
+				activeSquare = 6;		
+			}else if(x==7){
+				var c = document.getElementById("c31");	
+	        	c.innerHTML = '<div class="blueX">X</div>'; 				
+				c.style.visibility = "visible";
+				activeSquare = 7;		
+			}else if(x==8){
+				var c = document.getElementById("c32");	
+	        	c.innerHTML = '<div class="blueX">X</div>'; 				
+				c.style.visibility = "visible";
+				activeSquare = 8;		
+			}else if(x==9){
+				
+				var c = document.getElementById("c33");	
+	        	c.innerHTML = '<div class="blueX">X</div>'; 				
+				c.style.visibility = "visible";
+				activeSquare = 9;			
+			}	
+	    }
+	    
+	    function clickOnSquare(square){
+	    	//right precision!
+	    	if (activeSquare == square){
+	    		countPoints = countPoints + 1;
+	    	}
+	    	activeSquare = 0 ;
+	    	mainProcedure();
+	    }
+	    
+	    function showResults(){
+	    	//var c = document.getElementById("boardTable");			
+			//c.style.visibility = "hidden";
+			var element = document.getElementById('boardTable'); 
+	        element.innerHTML = '<div class="testInstruction"><center><br><h1>Resultados de precision:</h1><br><br><h1>Points : '+countPoints+'</h1></center></div>';			
+			db.transaction(insertDB,errorDB);
+			showConfirm();
+	    }
+	    
+	    function createDB(tx){
+	    	//tx.executeSql('DROP TABLE IF EXISTS VALORES');
+	    	//tx.executeSql('DROP TABLE IF EXISTS MEDICION');
+	    	tx.executeSql('CREATE TABLE IF NOT EXISTS MEDICION(id unique,fecha,tipo,px,py,pz)');
+	    } 
+
+		function errorDB(err){
+			alert('Error processing SQL AQUI: '+err.code);
+		}
+		
+		function errorDB1(err){
+			alert('Error processing SQL1: '+err.code);
+		}
+		
+		function errorDB2(err){
+			alert('Error processing SQL2: '+err.code);
+		}
+		
+		
+		function successDB(){
+		}
+
+		function gotFS(fileSystem) {
+			var FILENAME = 'resultsParkinsonTest'+'.txt';
+        	fileSystem.root.getFile(FILENAME, {create: true, exclusive: false}, gotFileEntry, fail);
+    	}
+
+    	function gotFileEntry(fileEntry) {
+        	fileEntry.createWriter(gotFileWriter, fail);
+    	}
+		
+		function gotFileWriter(writer) {
+           writer.write(htmlstring);
+     	}
+
+	    function fail(error) {
+	        console.log(error.code);
+	    }
+	    
+	    // Funcion que inserta en la base de datos la medicion obtenida
+	    function insertDB(tx){
+	 
+	    	var sql ;
+	    	date = new Date();
+	    	// Insertamos en la tabla de medicion
+	    	sql= 'INSERT INTO MEDICION(id,fecha,tipo,px,py,pz) VALUES (?,?,?,?,?,?)';
+	    	tx.executeSql(sql,[date.toTimeString(),date.toDateString(),tipo_med,countPoints,"0","0"],successQueryDB2,errorDB2);
+	    		    		
+	    }
+	    
+	    function successQueryDB2(tx){
+	  		// Esto muestra los valores
+	    	//tx.executeSql('SELECT * FROM MEDICION',[],renderList2,errorDB1);
+	    }
+	     // Funcion que muestra los resultados
+	    function renderList2(tx,results){
+	    	//var i;
+	    	//htmlstring += '%0D%0AX Count:' + countPoints + '%0D%0AX';
+	    }
+    // Muestra un cuadro de confirmación personalizado
+    //
+    function showConfirm() {
+        navigator.notification.confirm(
+    	'¿Deseas enviar los resultados ahora?',      // mensaje (message)
+    	onConfirm,      // función 'callback' a llamar con el índice del botón pulsado (confirmCallback)
+    	'Parkinson Test',            // titulo (title)
+        'Cancelar,Aceptar'          // botones (buttonLabels)
+        );
+    }
+		// procesa el resultado del cuadro de confirmación
+	    function onConfirm(button) {
+	        
+	        if (button==1){
+	        	window.location='index.html';
+	        }else{
+	        	var email='proyectoparkison@gmail.com';
+				var subject = 'ParkinsonTest-Resultados';
+				var cc = 'aileengmp@gmail.com';
+				var body = 'Resultados prueba de precision %0D%0A-Fecha: '+date.toTimeString()+'%0D%0A-Puntaje:'+countPoints;
+				var mailto_link = 'mailto:' + email+'?subject=ParkinsonTest&cc='+cc+'&body=' +body;
+				window.location= mailto_link;
+	        }
+	    }
+    </script>
+  </head>
+  <body>
+  
+  	<div class="mainBannerName">
+		<center>
+		<img src="images/nameBanner.fw.png" width="300" height="55"></img>
+		</center>
+	</div>
+	
+	<div class="testMenu">
+			<center>
+			<div class="testInstruction" id="testInstruction">
+				<center>
+					<div class="subtitle"><br><center>Examen de precision</center><br></div>
+					<div class="bloque">
+							Esta prueba ha sido creada para probar tu precision<br> Buena Suerte!
+					 </div>
+					 </center>
+				 <br>
+			</div>	
+				
+			<button  id="buttonStart" class="testButton" onclick="startTest()";>Comenzar</button>
+			<div id="boardTest">
+				<table class="boardTable" id="boardTable">
+					<tr>
+						<td id="c11" onclick="clickOnSquare('1')"></td>
+						<td id="c12" onclick="clickOnSquare('2')"></td>	
+						<td id="c13" onclick="clickOnSquare('3')"></td>																
+					</tr>
+					<tr>
+						<td id="c21" onclick="clickOnSquare('4')"></td>
+						<td id="c22" onclick="clickOnSquare('5')"></td>	
+						<td id="c23" onclick="clickOnSquare('6')"></td>																
+					</tr>					
+					<tr>
+						<td id="c31" onclick="clickOnSquare('7')"></td>
+						<td id="c32" onclick="clickOnSquare('8')"></td>	
+						<td id="c33" onclick="clickOnSquare('9')"></td>																
+					</tr>					
+				</table>
+				<div id="empty"></div>
+			</div>		
+		</center>
+   	</div>
+		
+  </body>
+</html>

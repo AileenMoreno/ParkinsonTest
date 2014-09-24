@@ -1,0 +1,42 @@
+<!DOCTYPE HTML>
+<html>
+	<head>
+		<title>Parkinson Test</title>
+		<link rel="stylesheet" type="text/css" href="css/indexDesign.css" media="screen" />
+		<meta name="viewport" content="width=device-width" />
+		<script type="text/javascript" charset="utf-8" src="cordova.js"></script>
+		<script type="text/javascript" charset="utf-8">
+
+		    // The watch id references the current `watchAcceleration`
+		    var watchID = null;
+		
+		    // Wait for PhoneGap to load
+		    //
+		    document.addEventListener("deviceready", onDeviceReady, false);
+	
+		   function onDeviceReady() {
+		    navigator.splashscreen.show();
+		    }
+		    
+		</script>
+	</head>
+	<body>
+		<div class="mainBannerName">
+			<center>
+				<img src="images/nameBanner.fw.png"  width="300" height="55"></img>
+			</center>
+		</div>
+		<center>
+			<table class="mainMenu">
+				<tr>
+					<td><center><br><br><br><a href="indexMenu-es.html" class="testButton">Español</a><br><br></center
+					</td>
+				</tr>
+				<tr>
+					<td><center><a href="indexMenu.html" class="testButton"> English</a><br><br></center>
+					</td>
+				</tr>
+			</table>
+		</center>
+	</body>
+</html>

@@ -1,0 +1,118 @@
+<!DOCTYPE html>
+<html>
+  <head>
+    <title>Acceleration Example</title>
+    <link rel="stylesheet" type="text/css" href="css/speedTestDesign.css" media="screen" />
+    <link rel="stylesheet" href="http://code.jquery.com/mobile/1.4.2/jquery.mobile-1.4.2.min.css">
+	<script src="http://code.jquery.com/jquery-1.10.2.min.js"></script>
+	<script src="http://code.jquery.com/mobile/1.4.2/jquery.mobile-1.4.2.min.js"></script>
+     <script type="text/javascript" charset="utf-8" src="cordova.js"></script>
+    <script type="text/javascript" charset="utf-8">
+
+		// Wait for PhoneGap to load
+	    document.addEventListener("deviceready", onDeviceReady, false);
+
+	   function onDeviceReady(){
+			
+			//iniciamos la bd
+			var db = window.openDatabase("Database","1.0 ","Cordova demo",30*1024*1024);
+			db.transaction(createDB,errorDB,successDB);
+			iniciar();
+	    }
+
+	    // The watch id references the current `watchAcceleration`
+	    var watchID = null;
+		
+		var htmlstring = '';
+	    
+	
+		
+		function iniciar(){
+			//alert('alo');
+		}
+	    
+	    function onBodyLoad(){
+	    	//alert('alo0');
+	    }
+	    
+	    function createDB(tx){
+	    	//tx.executeSql('DROP TABLE IF EXISTS VALORES');
+	    	// tx.executeSql('DROP TABLE IF EXISTS MEDICION');
+	    	 tx.executeSql('CREATE TABLE IF NOT EXISTS MEDICION(id unique,fecha,tipo,px,py,pz)'); 
+	    	 
+	    } 
+
+		function queryDB(tx){
+			tx.executeSql('SELECT * FROM MEDICION',[],renderList2,errorOtro);
+		}
+
+		function renderList2(tx,results){
+	    	var i;
+	    	console.log("Rows Affected = " + results.rowAffected);
+	    	 var element = document.getElementById('listaMediciones');
+	    	htmlstring = '';
+	    	var len = results.rows.length;
+	    	
+	    	for (i = 0;i<len;i++){
+	    		var tipo = results.rows.item(i).tipo;
+	    		htmlstring = 'ID: '+results.rows.item(i).id.substring(0,9);
+	    		if (tipo==1){
+	    			htmlstring += ' | Tipo: Pruebate';
+	    		}
+	    		if (tipo==2){
+	    			htmlstring += ' | Tipo: Brazos Flexionados';
+	    		}
+	    		if (tipo==3){
+	    			htmlstring += ' | Tipo: Brazos al frente';
+	    		}
+	    		if (tipo==4){
+	    			htmlstring += ' | Tipo: Prueba Precision';
+	    		}
+	    		
+	    		if (tipo==5){
+	    			htmlstring += ' | Tipo: Prueba Rapidez';
+	    		}
+	    		
+	    		$('ul').append($('<li/>', {'data-role': "listview"}).append($('<a/>', {'href': '','text': htmlstring})));
+				$('ul').listview('refresh');
+	    	}
+	    }
+
+		function errorDB(err){
+			alert('Error processing SQL: why'+err.code);
+		}
+		
+		function errorOtro(err){
+			alert('Error processing SQL SELECT: '+err.code);
+		}
+		
+		function errorSUCCESS(err){
+			alert('Error processing SQL: SUCCESSDB '+err.code);
+		}
+		
+		function successDB(tx){
+			var db = window.openDatabase("Database","1.0 ","Cordova demo",30*1024*1024);
+        	db.transaction(queryDB, errorSUCCESS);
+	    	
+		}
+
+    </script>
+    
+  </head>
+  <body>
+  
+  	<div class="mainBannerName">
+		<center>
+		<img src="images/nameBanner.fw.png" width="300" height="55"></img>
+		</center>
+	</div>
+	<div class="testMenu">
+		<center>
+			<ul class="agu" data-role="listview">
+			</ul>
+			
+		</center>
+   	</div>
+		
+  </body>
+</html>
