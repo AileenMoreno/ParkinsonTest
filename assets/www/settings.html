@@ -1,0 +1,41 @@
+<!DOCTYPE HTML>
+<html>
+	<head>
+		<title>Parkinson Test</title>
+		<link rel="stylesheet" type="text/css" href="css/indexDesign.css" media="screen" />
+		    <link rel="stylesheet" href="http://code.jquery.com/mobile/1.4.2/jquery.mobile-1.4.2.min.css">
+	<script src="http://code.jquery.com/jquery-1.10.2.min.js"></script>
+	<script src="http://code.jquery.com/mobile/1.4.2/jquery.mobile-1.4.2.min.js"></script>
+		<script type="text/javascript" charset="utf-8">
+
+		    // The watch id references the current `watchAcceleration`
+		    var watchID = null;
+		
+		    // Wait for PhoneGap to load
+		    //
+		    document.addEventListener("deviceready", onDeviceReady, false);
+	
+		   function onDeviceReady() {
+		    navigator.splashscreen.show();
+		    }
+		    
+		</script>
+	</head>
+	<body>
+		<div class="mainBannerName">
+			<center>
+				<img src="images/nameBanner.fw.png" width="300" height="55"></img>
+			</center>
+		</div>
+		<div class="testMenu">
+		<ul data-role="listview">
+			 
+			 <li data-role="list-divider" >Configuracion correo</li>
+		  <li><a href="">Correo electronico del medico</a></li>
+		  <li><a href="">Correo electronico otros</a></li>
+		  <li data-role="list-divider" >Configuracion Tiempos</li>
+		  <li><a href="">Configurar duracion de medicion</a></li>
+		</ul>
+		</div>
+	</body>
+</html>
