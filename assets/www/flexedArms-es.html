@@ -4,6 +4,7 @@
     <title>Acceleration Example</title>
     <link rel="stylesheet" type="text/css" href="css/speedTestDesign.css" media="screen" />
     <script type="text/javascript" charset="utf-8" src="cordova.js"></script>
+	<script type="text/javascript" charset="utf-8" src="email_composer.js"></script>    
     <script type="text/javascript" charset="utf-8">
 
 	    // The watch id references the current `watchAcceleration`
@@ -41,7 +42,6 @@
 		   	var sum_x = 0;
 		   	var sum_y = 0;
 		   	var sum_z = 0;
-		   	alert(len);
 		   	for (i=0;i<len;i++){
 		   		sum_x = sum_x + acc_x[i];
 		   		sum_y = sum_y + acc_y[i];
@@ -75,9 +75,6 @@
 			alert('Error processing SQL: '+err.code);
 		}
 		
-		function successDB(){
-		}
-		
 		function gotFS(fileSystem) {
 			var FILENAME = 'resultsParkinsonTest'+'.txt';
 			
@@ -88,14 +85,23 @@
         	fileEntry.createWriter(gotFileWriter, fail);
     	}
 		
+		
 		function gotFileWriter(writer) {
-           writer.write(htmlstring);
-     	}
+		    var len   = acc_x.length;
+			var data = 'Parkinson-Test\nResultado prueba de brazos flexionados \n Valores(x,y,z) \n'; 
 
+	    	var i = 0;
+	    	for (i = 0;i<len;i++){
+	    		data = data + '' + acc_x[i]+','+acc_y[i]+','+acc_z[i]+';\n';
+	    	}	
+		   writer.write(data);
+     	}
+		
 	    function fail(error) {
 	        console.log(error.code);
 	    }
 	    
+		
 	    function startTest(){
 			var start = document.getElementById("buttonStart");
 			var text = document.getElementById("testInstruction");			
@@ -190,7 +196,7 @@
 				
 				db.transaction(insertDB,errorDB);
 				// Inicia el proceso de escritura
-				//window.requestFileSystem(LocalFileSystem.PERSISTENT, 0, gotFS, fail);	 
+				window.requestFileSystem(LocalFileSystem.PERSISTENT, 0, gotFS, fail);	 
 				showConfirm();          
 	        }
 	        
@@ -298,12 +304,15 @@
 	        if (button==1){
 	        	window.location='index.html';
 	        }else{
+					
 	        	var email='proyectoparkinson@gmail.com';
 				var subject = 'ParkinsonTest-Resultados';
 				var cc = 'aileengmp@gmail.com';
-				var body = 'Resultados de examen sobre brazos flexionados %0D%0A-Date: '+date.toTimeString()+'%0D%0A-Promedio x:'+prom_x+'%0D%0A%0D%0A-Promedio y:'+prom_y+'%0D%0A%0D%0A -Promedio z:'+prom_z+'%0D%0A %0D%0A-Valores: %0D%0A'+htmlstring;
-				var mailto_link = 'mailto:' + email+'?subject=ParkinsonTest&cc='+cc+'&body=' +body;
-				window.location= mailto_link;
+				var body = 'Resultados prueba temblor de brazos flexionados \n Date: '+date.toTimeString();
+				var mailto_link = 'mailto:' + email+'?subject=ParkinsonTest&cc='+cc+'&body=see attachment&attachment="resultsParkinsonTest.txt'
+				var attach = new Array();
+				attach.push("/sdcard/resultsParkinsonTest.txt");
+				window.plugins.emailComposer.showEmailComposer(subject,body,email,cc,cc,cc,attach);				
 	        }
 	    }
 		

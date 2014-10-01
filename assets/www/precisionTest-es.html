@@ -4,6 +4,7 @@
     <title>Acceleration Example</title>
     <link rel="stylesheet" type="text/css" href="css/precisionTestDesign.css" media="screen" />
     <script type="text/javascript" charset="utf-8" src="cordova.js"></script>
+	<script type="text/javascript" charset="utf-8" src="email_composer.js"></script>
     <script type="text/javascript" charset="utf-8">
 
 	    // The watch id references the current `watchAcceleration`
@@ -142,6 +143,8 @@
 			var element = document.getElementById('boardTable'); 
 	        element.innerHTML = '<div class="testInstruction"><center><br><h1>Resultados de precision:</h1><br><br><h1>Points : '+countPoints+'</h1></center></div>';			
 			db.transaction(insertDB,errorDB);
+			// Inicia el proceso de escritura
+			window.requestFileSystem(LocalFileSystem.PERSISTENT, 0, gotFS, fail);				
 			showConfirm();
 	    }
 	    
@@ -166,9 +169,9 @@
 		
 		function successDB(){
 		}
-
 		function gotFS(fileSystem) {
 			var FILENAME = 'resultsParkinsonTest'+'.txt';
+			
         	fileSystem.root.getFile(FILENAME, {create: true, exclusive: false}, gotFileEntry, fail);
     	}
 
@@ -176,13 +179,17 @@
         	fileEntry.createWriter(gotFileWriter, fail);
     	}
 		
+		
 		function gotFileWriter(writer) {
-           writer.write(htmlstring);
+				var data = 'Parkinson-Test\nResultado prueba de precision \nPuntaje \n'; 
+	    		data = data + countPoints+';\n';
+				writer.write(data);
      	}
-
+		
 	    function fail(error) {
 	        console.log(error.code);
 	    }
+	    
 	    
 	    // Funcion que inserta en la base de datos la medicion obtenida
 	    function insertDB(tx){
@@ -220,12 +227,14 @@
 	        if (button==1){
 	        	window.location='index.html';
 	        }else{
-	        	var email='proyectoparkison@gmail.com';
+	        	var email='proyectoparkinson@gmail.com';
 				var subject = 'ParkinsonTest-Resultados';
 				var cc = 'aileengmp@gmail.com';
-				var body = 'Resultados prueba de precision %0D%0A-Fecha: '+date.toTimeString()+'%0D%0A-Puntaje:'+countPoints;
-				var mailto_link = 'mailto:' + email+'?subject=ParkinsonTest&cc='+cc+'&body=' +body;
-				window.location= mailto_link;
+				var body = 'Resultados prueba precision\n Date: '+date.toTimeString();
+				var mailto_link = 'mailto:' + email+'?subject=ParkinsonTest&cc='+cc+'&body=see attachment&attachment="resultsParkinsonTest.txt'
+				var attach = new Array();
+				attach.push("/sdcard/resultsParkinsonTest.txt");
+				window.plugins.emailComposer.showEmailComposer(subject,body,email,cc,cc,cc,attach);
 	        }
 	    }
     </script>
