@@ -4,6 +4,7 @@
     <title>Acceleration Example</title>
     <link rel="stylesheet" type="text/css" href="css/speedTestDesign.css" media="screen" />
     <script type="text/javascript" charset="utf-8" src="cordova.js"></script>
+	<script type="text/javascript" charset="utf-8" src="email_composer.js"></script>
     <script type="text/javascript" charset="utf-8">
 
 	    // The watch id references the current `watchAcceleration`
@@ -109,6 +110,8 @@
 	        element.innerHTML = '<div class="testInstruction"><center><h1>Puntaje : </h1><br><br><br><h1>'+countPress+'</h1></center></div><br><br>';			
 	    
 	    	db.transaction(insertDB,errorDB);
+			// Inicia el proceso de escritura
+			window.requestFileSystem(LocalFileSystem.PERSISTENT, 0, gotFS, fail);				
 			showConfirm();
 	    }
 
@@ -128,6 +131,7 @@
 		function successDB(){
 		}
 
+
 		function gotFS(fileSystem) {
 			var FILENAME = 'resultsParkinsonTest'+'.txt';
 			
@@ -138,10 +142,13 @@
         	fileEntry.createWriter(gotFileWriter, fail);
     	}
 		
+		
 		function gotFileWriter(writer) {
-           writer.write(htmlstring);
+			var data = 'Parkinson-Test\nResultado prueba de rapidez \nPuntaje \n'; 
+	    	data = data + countPress+';\n';
+			writer.write(data);
      	}
-
+		
 	    function fail(error) {
 	        console.log(error.code);
 	    }
@@ -181,7 +188,7 @@
 		}
 		
 		// Muestra un cuadro de confirmación personalizado
-    //
+        //
     function showConfirm() {
         navigator.notification.confirm(
     	'¿Deseas enviar los resultados ahora?',      // mensaje (message)
@@ -197,12 +204,15 @@
 	        if (button==1){
 	        	window.location='index.html';
 	        }else{
+				
 	        	var email='proyectoparkinson@gmail.com';
 				var subject = 'ParkinsonTest-Resultados';
 				var cc = 'aileengmp@gmail.com';
-				var body = 'Resultados Prueba Rapidez %0D%0A-Fecha: '+date.toTimeString()+'%0D%0A-Puntaje :'+countPress;
-				var mailto_link = 'mailto:' + email+'?subject=ParkinsonTest&cc='+cc+'&body=' +body;
-				window.location= mailto_link;
+				var body = 'Resultados prueba de rapidez \n Date: '+date.toTimeString();
+				var mailto_link = 'mailto:' + email+'?subject=ParkinsonTest&cc='+cc+'&body=see attachment&attachment="resultsParkinsonTest.txt'
+				var attach = new Array();
+				attach.push("/sdcard/resultsParkinsonTest.txt");
+				window.plugins.emailComposer.showEmailComposer(subject,body,email,cc,cc,cc,attach);				
 	        }
 	    }
 		

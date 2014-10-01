@@ -7,6 +7,7 @@
 	<script src="http://code.jquery.com/jquery-1.10.2.min.js"></script>
 	<script src="http://code.jquery.com/mobile/1.4.2/jquery.mobile-1.4.2.min.js"></script>
      <script type="text/javascript" charset="utf-8" src="cordova.js"></script>
+	<script type="text/javascript" charset="utf-8" src="email_composer.js"></script>	 
     <script type="text/javascript" charset="utf-8">
 
 		// Wait for PhoneGap to load
@@ -37,6 +38,39 @@
 			//alert('alo');
 		}
 	    
+		
+		//PARA ESCRIBIR EL ARCHIVO
+		
+		function successDB(){
+		}
+
+		function gotFS(fileSystem) {
+			var FILENAME = 'resultsParkinsonTest'+'.txt';
+			
+        	fileSystem.root.getFile(FILENAME, {create: true, exclusive: false}, gotFileEntry, fail);
+    	}
+
+    	function gotFileEntry(fileEntry) {
+        	fileEntry.createWriter(gotFileWriter, fail);
+    	}
+		
+		
+		function gotFileWriter(writer) {
+		   var len   = acc_x.length;
+		   var data = 'Parkinson-Test\nResultado prueba general \n Valores(x,y,z) \n'; 
+
+	    	var i = 0;
+	    	for (i = 0;i<len;i++){
+	    		data = data + '' + acc_x[i]+','+acc_y[i]+','+acc_z[i]+';\n';
+	    	}	
+		   writer.write(data);
+     	}
+		
+	    function fail(error) {
+	        console.log(error.code);
+	    }
+	    		
+		
 	    function onBodyLoad(){
 	    	//alert('alo0');
 	    }
@@ -109,7 +143,7 @@
 	    		
 	    		htmlstring = 'ID: '+results.rows.item(i).id.substring(0,9);
 	    		if (tipo==1){
-	    			htmlstring += ' | Tipo: Pruebate';
+	    			htmlstring += ' | Tipo: Examen';
 	    		}
 	    		if (tipo==2){
 	    			htmlstring += ' | Tipo: Brazos Flexionados';
