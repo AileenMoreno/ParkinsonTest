@@ -1,8 +1,9 @@
 <!DOCTYPE HTML>
 <html>
 	<head>
-		<title>Parkinson Test</title>
+		<meta name="viewport" content="width=device-width, initial-scale=1">
 		<link rel="stylesheet" type="text/css" href="css/indexDesign.css" media="screen" />
+		<script type="text/javascript" charset="utf-8" src="cordova.js"></script>
 		    <link rel="stylesheet" href="http://code.jquery.com/mobile/1.4.2/jquery.mobile-1.4.2.min.css">
 	<script src="http://code.jquery.com/jquery-1.10.2.min.js"></script>
 	<script src="http://code.jquery.com/mobile/1.4.2/jquery.mobile-1.4.2.min.js"></script>
@@ -10,33 +11,202 @@
 
 		    // The watch id references the current `watchAcceleration`
 		    var watchID = null;
-		
+			var db;
 		    // Wait for PhoneGap to load
-		    //
 		    document.addEventListener("deviceready", onDeviceReady, false);
 	
 		   function onDeviceReady() {
-		    navigator.splashscreen.show();
+		    	navigator.splashscreen.show();
+		    	
+		    	//iniciamos la bd
+				db = window.openDatabase("Database","1.0 ","Cordova demo",2*1024*1024);
+				db.transaction(createDB,errorDB,successDB);	
+		    }
+		    
+		    function createDB(tx){
+		    	//tx.executeSql('DROP TABLE IF EXISTS VALORES');
+		    	//tx.executeSql('DROP TABLE IF EXISTS MEDICION');
+		    	
+		    	tx.executeSql('CREATE TABLE IF NOT EXISTS TIEMPO(valorTiempo)');
+		    	tx.executeSql('CREATE TABLE IF NOT EXISTS TMUESTRAS(valorTiempo)');
+		    	
+		    	// Consultar cual es el tiempo actual
+		    	//tx.executeSql('SELECT * FROM TIEMPO',[],renderList2,errorDB);
+		   
+		    	navigator.notification.alert(
+				    'DB Creada!',     // mensaje (message)
+				    successDB,         // función 'callback' (alertCallback)
+				    'Its ok',            // titulo (title)
+				    'Cerrar'                // nombre del botón (buttonName)
+				);
+		    	
+		    } 
+	
+			function renderList2(tx,results){
+		    	var i;
+		    	console.log("Rows Affected search TIEMPO = " + results.rowAffected);
+		    	var len = results.rows.length;
+		    	
+		    	for (i = 0;i<len;i++){
+		    		tiempoActual = results.rows.item(i).valorTiempo;
+		    		navigator.notification.alert(
+					    'Tiempo Actual!'+tiempoActual,     // mensaje (message)
+					    successDB,         // función 'callback' (alertCallback)
+					    'Its ok',            // titulo (title)
+					    'Cerrar'                // nombre del botón (buttonName)
+					);
+		    	}
+		    }
+		
+			function errorDB(err){
+				alert('Error processing SQL: '+err.code);
+			}
+			
+			function successDB(){
+			}
+		    
+		    function cambiarTiempoDuracion(){
+		    	db.transaction(insertDB,errorDB);
+		    	$.mobile.back();
+		    }
+		    
+		    function cambiarTiempoMuestras(){
+		    	db.transaction(insertDB2,errorDB);
+		    	$.mobile.back();
+		    }
+		    
+		    function deletedDB(){
+		    	navigator.notification.alert(
+				    'Row Eliminado!',     // mensaje (message)
+				    successDB,         // función 'callback' (alertCallback)
+				    'Its ok',            // titulo (title)
+				    'Cerrar'                // nombre del botón (buttonName)
+				);
+		    }
+		    
+		    // Funcion que inserta en la base de datos la medicion obtenida
+		    function insertDB(tx){
+		    	var sql ;
+		    	
+		    	// obtenemos el valor del tiempo nuevo
+		    	time1= document.getElementById("tiempo1").value;
+		    	
+		    	tx.executeSql('DROP TABLE IF EXISTS TIEMPO');
+		    	tx.executeSql('CREATE TABLE IF NOT EXISTS TIEMPO(valorTiempo)');
+		    	
+		    	// Insertamos en la tabla de medicion
+		    	sql= 'INSERT INTO TIEMPO(valorTiempo) VALUES (?)';
+		    	tx.executeSql(sql,[time1],successQueryDB2,errorDB);
+		    }
+		    
+		    // Funcion que inserta en la base de datos el tiempo entre toma de muestras
+		    function insertDB2(tx){
+		    	var sql ;
+		    	
+		    	// obtenemos el valor del tiempo nuevo
+		    	time2= document.getElementById("tiempo2").value;
+		    	
+		    	tx.executeSql('DROP TABLE IF EXISTS TMUESTRAS');
+		    	tx.executeSql('CREATE TABLE IF NOT EXISTS TMUESTRAS(valorTiempo)');
+		    	
+		    	// Insertamos en la tabla de medicion
+		    	sql= 'INSERT INTO TMUESTRAS(valorTiempo) VALUES (?)';
+		    	tx.executeSql(sql,[time2],successQueryDB3,errorDB);
+		    }
+		    
+		    function successQueryDB2(tx){
+		  		navigator.notification.alert(
+				    'Nuevo Tiempo de Medicion!',     // mensaje (message)
+				    successDB,         // función 'callback' (alertCallback)
+				    'Its ok',            // titulo (title)
+				    'Cerrar'                // nombre del botón (buttonName)
+				);
+		    }
+		    
+		    function successQueryDB3(tx){
+		  		navigator.notification.alert(
+				    'Nuevo Tiempo entre Muestras!',     // mensaje (message)
+				    successDB,         // función 'callback' (alertCallback)
+				    'Its ok',            // titulo (title)
+				    'Cerrar'                // nombre del botón (buttonName)
+				);
 		    }
 		    
 		</script>
 	</head>
 	<body>
-		<div class="mainBannerName">
-			<center>
-				<img src="images/nameBanner.fw.png" width="300" height="55"></img>
-			</center>
+		<div data-role="page"  id="pageone">
+			<div data-role="main" class="ui-content">
+				<div class="mainBannerName">
+					<center>
+						<img src="images/nameBanner.fw.png" width="300" height="55"></img>
+					</center>
+				</div>
+				<div class="testMenu">
+					<ul data-role="listview" data-inset="true">
+						 
+						 <li data-role="list-divider" >Configuracion correo</li>
+					  <li data-icon="false"><a href="">Correo electronico del medico</a></li>
+					  <li data-icon="false"><a href="">Correo electronico otros</a></li>
+					  <li data-role="list-divider" >Configuracion Tiempos</li>
+					  <li data-icon="false"><a href="#configDuracionMedicion" data-rel="dialog">Configurar duracion de medicion</a></li>
+					  <li data-icon="false"><a href="">Configurar tiempo de toma de muestras</a></li>
+					</ul>
+				</div>
+			
+			</div>
 		</div>
-		<div class="testMenu">
-		<ul data-role="listview" data-inset="true">
-			 
-			 <li data-role="list-divider" >Configuracion correo</li>
-		  <li data-icon="false"><a href="">Correo electronico del medico</a></li>
-		  <li data-icon="false"><a href="">Correo electronico otros</a></li>
-		  <li data-role="list-divider" >Configuracion Tiempos</li>
-		  <li data-icon="false"><a href="">Configurar duracion de medicion</a></li>
-		  <li data-icon="false"><a href="">Configurar tiempo de toma de muestras</a></li>
-		</ul>
+		
+		
+		
+		<div data-role="page" data-dialog="true" id="configDuracionMedicion">
+		
+		  <div data-role="header" >
+		    <h2>Configurar tiempo</h2>
+		  </div>
+		  <div class="ui-content" role="main">
+		  
+		    <h2>Configurar duracion de la medicion</h2>
+		    <p>Este tiempo define la duracion que tendra cada una de las mediciones.</p>
+		    <form>
+			  <input type="number" name="quantity" placeholder="Tiempo en segundos" id="tiempo1">
+			  
+			</form>
+		    <div class="ui-grid-a">
+		      <div class="ui-block-a">
+		        <a href="#" id="exit-button" class="ui-btn ui-btn-b ui-shadow ui-corner-all">Cancelar</a>
+		      </div>
+		      <div class="ui-block-b" >
+		        <a href="#" id="cancel-button" onclick="cambiarTiempoDuracion()" class="ui-btn ui-shadow ui-corner-all">Guardar</a>
+		      </div>
+		    </div>
+		  </div>
 		</div>
+		
+		<div data-role="page" data-dialog="true" id="configTomaMuestras">
+		
+		  <div data-role="header" >
+		    <h2>Configurar tiempo</h2>
+		  </div>
+		  <div class="ui-content" role="main">
+		  
+		    <h2>Configurar tiempo entre muestras</h2>
+		    <p>Este tiempo define el intervalo de tiempo deseado entre dos tomas de muestras.</p>
+		    <form>
+			  <input type="number" name="quantity" placeholder="Tiempo en milisegundos" id="tiempo2">
+			  
+			</form>
+		    <div class="ui-grid-a">
+		      <div class="ui-block-a">
+		        <a href="#" id="exit-button" class="ui-btn ui-btn-b ui-shadow ui-corner-all">Cancelar</a>
+		      </div>
+		      <div class="ui-block-b" >
+		        <a href="#" id="cancel-button" onclick="cambiarTiempoMuestras()" class="ui-btn ui-shadow ui-corner-all">Guardar</a>
+		      </div>
+		    </div>
+		  </div>
+		</div>
+		
+		
 	</body>
 </html>
