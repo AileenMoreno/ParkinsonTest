@@ -12,6 +12,7 @@
 		    // The watch id references the current `watchAcceleration`
 		    var watchID = null;
 			var db;
+			
 		    // Wait for PhoneGap to load
 		    document.addEventListener("deviceready", onDeviceReady, false);
 	
@@ -24,14 +25,11 @@
 		    }
 		    
 		    function createDB(tx){
-		    	//tx.executeSql('DROP TABLE IF EXISTS VALORES');
-		    	//tx.executeSql('DROP TABLE IF EXISTS MEDICION');
 		    	
-		    	tx.executeSql('CREATE TABLE IF NOT EXISTS TIEMPO(valorTiempo)');
-		    	tx.executeSql('CREATE TABLE IF NOT EXISTS TMUESTRAS(valorTiempo)');
+		    	tx.executeSql('CREATE TABLE IF NOT EXISTS TIEMPO(valorTiempo,tipoTiempo)');
 		    	
 		    	// Consultar cual es el tiempo actual
-		    	//tx.executeSql('SELECT * FROM TIEMPO',[],renderList2,errorDB);
+		    	tx.executeSql('SELECT * FROM TIEMPO',[],renderList2,errorDB);
 		   
 		    	navigator.notification.alert(
 				    'DB Creada!',     // mensaje (message)
@@ -44,10 +42,11 @@
 	
 			function renderList2(tx,results){
 		    	var i;
-		    	console.log("Rows Affected search TIEMPO = " + results.rowAffected);
-		    	var len = results.rows.length;
 		    	
+		    	var len = results.rows.length;
+		    	console.log("Rows Affected search TIEMPO = " + len);
 		    	for (i = 0;i<len;i++){
+		    	
 		    		tiempoActual = results.rows.item(i).valorTiempo;
 		    		navigator.notification.alert(
 					    'Tiempo Actual!'+tiempoActual,     // mensaje (message)
@@ -66,6 +65,7 @@
 			}
 		    
 		    function cambiarTiempoDuracion(){
+		    	
 		    	db.transaction(insertDB,errorDB);
 		    	$.mobile.back();
 		    }
@@ -75,14 +75,7 @@
 		    	$.mobile.back();
 		    }
 		    
-		    function deletedDB(){
-		    	navigator.notification.alert(
-				    'Row Eliminado!',     // mensaje (message)
-				    successDB,         // función 'callback' (alertCallback)
-				    'Its ok',            // titulo (title)
-				    'Cerrar'                // nombre del botón (buttonName)
-				);
-		    }
+		    
 		    
 		    // Funcion que inserta en la base de datos la medicion obtenida
 		    function insertDB(tx){
@@ -91,12 +84,29 @@
 		    	// obtenemos el valor del tiempo nuevo
 		    	time1= document.getElementById("tiempo1").value;
 		    	
-		    	tx.executeSql('DROP TABLE IF EXISTS TIEMPO');
-		    	tx.executeSql('CREATE TABLE IF NOT EXISTS TIEMPO(valorTiempo)');
+		    	// Eliminamos ROWS de tiempo de tipo 1
+		    	var t="1";
+		    	tx.executeSql('DELETE FROM TIEMPO WHERE tipoTiempo=?', [t], deleteSuccess, errorNOTFIND);
 		    	
 		    	// Insertamos en la tabla de medicion
-		    	sql= 'INSERT INTO TIEMPO(valorTiempo) VALUES (?)';
-		    	tx.executeSql(sql,[time1],successQueryDB2,errorDB);
+		    	sql= 'INSERT INTO TIEMPO(valorTiempo,tipoTiempo) VALUES (?,?)';
+		    	tx.executeSql(sql,[time1,"1"],successQueryDB2,errorDB);
+		    	
+		    	//Textbox vacio
+		    	document.getElementById("tiempo1").value="";
+		    	
+		    }
+		    
+		    function errorNOTFIND(tx){
+		    	console.log("Error eliminando items en la tabla TIEMPO");
+		    }
+		    
+		    function deleteSuccess(tx){
+		    	console.log("Eliminado item que tiene tipoTiempo=1");
+		    }
+		    
+		    function deleteSuccess2(tx){
+		    	console.log("Eliminado item que tiene tipoTiempo=2");
 		    }
 		    
 		    // Funcion que inserta en la base de datos el tiempo entre toma de muestras
@@ -106,30 +116,24 @@
 		    	// obtenemos el valor del tiempo nuevo
 		    	time2= document.getElementById("tiempo2").value;
 		    	
-		    	tx.executeSql('DROP TABLE IF EXISTS TMUESTRAS');
-		    	tx.executeSql('CREATE TABLE IF NOT EXISTS TMUESTRAS(valorTiempo)');
+		    	// Eliminamos ROWS de tiempo de tipo 2
+		    	var t="2";
+		    	tx.executeSql('DELETE FROM TIEMPO WHERE tipoTiempo=?', [t], deleteSuccess2, errorNOTFIND);
 		    	
-		    	// Insertamos en la tabla de medicion
-		    	sql= 'INSERT INTO TMUESTRAS(valorTiempo) VALUES (?)';
-		    	tx.executeSql(sql,[time2],successQueryDB3,errorDB);
+		    	// Insertamos
+		    	sql= 'INSERT INTO TIEMPO(valorTiempo,tipoTiempo) VALUES (?,?)';
+		    	tx.executeSql(sql,[time2,t],successQueryDB3,errorDB);
+		    	
+		    	document.getElementById("tiempo2").value="";
+		    	
 		    }
 		    
 		    function successQueryDB2(tx){
-		  		navigator.notification.alert(
-				    'Nuevo Tiempo de Medicion!',     // mensaje (message)
-				    successDB,         // función 'callback' (alertCallback)
-				    'Its ok',            // titulo (title)
-				    'Cerrar'                // nombre del botón (buttonName)
-				);
+		  		console.log("Actualizado tiempo de duracion de la medicion");
 		    }
 		    
 		    function successQueryDB3(tx){
-		  		navigator.notification.alert(
-				    'Nuevo Tiempo entre Muestras!',     // mensaje (message)
-				    successDB,         // función 'callback' (alertCallback)
-				    'Its ok',            // titulo (title)
-				    'Cerrar'                // nombre del botón (buttonName)
-				);
+		  		console.log("Actualizado tiempo de toma de muestras");
 		    }
 		    
 		</script>
@@ -150,7 +154,7 @@
 					  <li data-icon="false"><a href="">Correo electronico otros</a></li>
 					  <li data-role="list-divider" >Configuracion Tiempos</li>
 					  <li data-icon="false"><a href="#configDuracionMedicion" data-rel="dialog">Configurar duracion de medicion</a></li>
-					  <li data-icon="false"><a href="">Configurar tiempo de toma de muestras</a></li>
+					  <li data-icon="false"><a href="#configTomaMuestras">Configurar tiempo de toma de muestras</a></li>
 					</ul>
 				</div>
 			
