@@ -31,12 +31,6 @@
 		    	// Consultar cual es el tiempo actual
 		    	tx.executeSql('SELECT * FROM TIEMPO',[],renderList2,errorDB);
 		   
-		    	navigator.notification.alert(
-				    'DB Creada!',     // mensaje (message)
-				    successDB,         // función 'callback' (alertCallback)
-				    'Its ok',            // titulo (title)
-				    'Cerrar'                // nombre del botón (buttonName)
-				);
 		    	
 		    } 
 	
@@ -48,12 +42,7 @@
 		    	for (i = 0;i<len;i++){
 		    	
 		    		tiempoActual = results.rows.item(i).valorTiempo;
-		    		navigator.notification.alert(
-					    'Tiempo Actual!'+tiempoActual,     // mensaje (message)
-					    successDB,         // función 'callback' (alertCallback)
-					    'Its ok',            // titulo (title)
-					    'Cerrar'                // nombre del botón (buttonName)
-					);
+		    		
 		    	}
 		    }
 		

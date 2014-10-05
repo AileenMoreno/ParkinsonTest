@@ -177,14 +177,19 @@
 			var empty = document.getElementById("empty");	    
 			
 			empty.style.display  = "block";	
-			console.log("antes select");
+			
 			// Buscar en la BD el tiempo entre muestras
 			db.transaction(selectTiempo,errorDB,successDB);
-			console.log("despues select");
-	    	// Frecuencia define cada cuanto tiempo se toman muestras
-			var options = { frequency: frecuencia };
-			watchID = navigator.accelerometer.watchAcceleration(onSuccess, onError, options);
+			
+	    	// Esto es para medir el tiempo del test
+			setTimeout("verAcc()",1000);
+	    	
+	    }
 	    
+	    function verAcc(){
+			// Frecuencia define cada cuanto tiempo se toman muestras
+			var options = { frequency: parseInt(frecuencia) };
+			watchID = navigator.accelerometer.watchAcceleration(onSuccess, onError, options);
 	    }
 	    
 	    function selectTiempo(tx){
@@ -193,17 +198,17 @@
 	    
 
 	    function renderListTiempo(tx,results){
-	    	var i;
-	    	
+	    	var i;	
 	    	var len = results.rows.length;
 	    	console.log("Rows Affected search TIEMPO = " + len);
 	    	for (i = 0;i<len;i++){
-	    	
-	    		if (results.rows.item(i).tipoTiempo==2){
-	    			frecuencia = results.rows.item(i).valorTiempo;
+	    		tipo=results.rows.item(i).tipoTiempo;
+	    		valor = results.rows.item(i).valorTiempo;
+	    		if (tipo==2){
+	    			frecuencia = valor;
 	    		}
-	    		if (results.rows.item(i).tipoTiempo==1){
-	    			duracion = results.rows.item(i).valorTiempo;
+	    		if (tipo==1){
+	    			duracion = valor;
 	    		}
 	    	}
 		}
@@ -233,8 +238,8 @@
 	    //
 	    function onSuccess(acceleration) {
 	    	console.log("Inicia obtencion de aceleracion");
-	    	// Esto es para medir el tiempo del test
-			setTimeout("stopWatch()",duracion);
+	    	
+	    	setTimeout("stopWatch()",parseInt(duracion));
 		
 	        var element = document.getElementById('empty');
 	        element.innerHTML = '<div class="showAcceleration"><center><h1>Aceleracion</h1>' +
@@ -361,7 +366,7 @@
 				<div class="subtitle"><br><center>Brazos flexionados</center><br></div>
 				<div class="bloque">
 				Esta prueba ha sido creada para medir tu tremor en estado de resposo
-				Debes mantener los brazos flexionados  por 30 seg.
+				Debes mantener los brazos flexionados  por varios seg.
 				</div>
 				 <br>
 				 <center>

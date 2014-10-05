@@ -17,6 +17,7 @@
 		// variable para almacenar el ultimo tipo de medicion
 		var tipo_med = 5;
 		 
+		var duracion; 
 		 // Wait for PhoneGap to load
 	   
 	    document.addEventListener("deviceready", onDeviceReady, false);
@@ -94,9 +95,36 @@
 			empty.style.display  = "none";	
 			speed.style.display = "block";				
 			
-			// Esto es para medir el tiempo del test,30 seg.
-			setTimeout("showResults()",30000); 			    			 			
+			// Buscar en la BD el tiempo entre muestras
+			db.transaction(selectTiempo,errorDB,successDB);
+			
+			// Esto es para medir el tiempo del test
+			setTimeout("verAcc()",1000);
+					    			 			
 	    }	
+	    
+	    function verAcc(){
+			// Esto es para medir el tiempo del test,60 seg.
+			setTimeout("showResults()",parseInt(duracion)); 				
+	    }
+	    
+	     function selectTiempo(tx){
+	    	tx.executeSql('SELECT * FROM TIEMPO',[],renderListTiempo,errorDB);	
+	    }
+	    
+	    function renderListTiempo(tx,results){
+	    	var i;	
+	    	var len = results.rows.length;
+	    	console.log("Rows Affected search TIEMPO = " + len);
+	    	for (i = 0;i<len;i++){
+	    		tipo=results.rows.item(i).tipoTiempo;
+	    		valor = results.rows.item(i).valorTiempo;
+	    		
+	    		if (tipo==1){
+	    			duracion = valor;
+	    		}
+	    	}
+		}
 	    
 	    
 	    //Hay que crear una especie de contador
@@ -118,9 +146,8 @@
 	
 		
 		function createDB(tx){
-	    	//tx.executeSql('DROP TABLE IF EXISTS VALORES');
-	    	//tx.executeSql('DROP TABLE IF EXISTS MEDICION');
 	    	tx.executeSql('CREATE TABLE IF NOT EXISTS MEDICION(id unique,fecha,tipo,px,py,pz)');
+	    	tx.executeSql('CREATE TABLE IF NOT EXISTS TIEMPO(valorTiempo,tipoTiempo)');
 	    	
 	    } 
 
@@ -235,7 +262,7 @@
 					<div class="bloque">
 					
 						Esta prueba ha sido creada para probar su rapirez, debe presionar
-						el boton tantas veces como pueda durante 30 segundos<br> Buena Suerte!
+						el boton tantas veces como pueda durante varios segundos<br> Buena Suerte!
 					 </div>
 					 </center>
 				 <br>				

@@ -30,6 +30,9 @@
 		// variable para almacenar el ultimo tipo de medicion
 		var tipo_med = 1;// 
 		
+		var frecuencia;
+		var duracion;
+		
 	    // Wait for PhoneGap to load
 	    document.addEventListener("deviceready", onDeviceReady, false);
 
@@ -79,10 +82,11 @@
 
 			    
 	    function createDB(tx){
-	    	tx.executeSql('DROP TABLE IF EXISTS VALORES');
-	    	tx.executeSql('DROP TABLE IF EXISTS MEDICION');
+	    	//tx.executeSql('DROP TABLE IF EXISTS VALORES');
+	    	//tx.executeSql('DROP TABLE IF EXISTS MEDICION');
 	    	tx.executeSql('CREATE TABLE IF NOT EXISTS MEDICION(id unique,fecha,tipo,px,py,pz)');
 	    	tx.executeSql('CREATE TABLE IF NOT EXISTS VALORES(id_medicion,x,y,z)');
+	    	tx.executeSql('CREATE TABLE IF NOT EXISTS TIEMPO(valorTiempo,tipoTiempo)');
 	    } 
 
 		function errorDB(err){
@@ -167,15 +171,45 @@
 			var div2 = document.getElementById("start");
 			div.style.display = "none";
 			div2.style.display = "none";
-							
-			// Update acceleration every 3 seconds
-			var options = { frequency: 500 };
-			watchID = navigator.accelerometer.watchAcceleration(onSuccess, onError, options);
 			
 			//Efectos
 			navigator.notification.vibrate(500);  
-			navigator.notification.beep(2);	 			
+			navigator.notification.beep(2);	 	
+			
+			// Buscar en la BD el tiempo entre muestras
+			db.transaction(selectTiempo,errorDB,successDB);
+			
+	    	// Esto es para medir el tiempo del test
+			setTimeout("verAcc()",1000);
+			
 	    }
+	    
+	    function verAcc(){
+			// Frecuencia define cada cuanto tiempo se toman muestras
+			var options = { frequency: parseInt(frecuencia) };
+			watchID = navigator.accelerometer.watchAcceleration(onSuccess, onError, options);
+	    }
+	    
+	    function selectTiempo(tx){
+	    	tx.executeSql('SELECT * FROM TIEMPO',[],renderListTiempo,errorDB);	
+	    }
+	    
+
+	    function renderListTiempo(tx,results){
+	    	var i;	
+	    	var len = results.rows.length;
+	    	console.log("Rows Affected search TIEMPO = " + len);
+	    	for (i = 0;i<len;i++){
+	    		tipo=results.rows.item(i).tipoTiempo;
+	    		valor = results.rows.item(i).valorTiempo;
+	    		if (tipo==2){
+	    			frecuencia = valor;
+	    		}
+	    		if (tipo==1){
+	    			duracion = valor;
+	    		}
+	    	}
+		}
 	    
 	    // Funcion que inserta en la base de datos la medicion obtenida
 	    function insertDB(tx){
@@ -258,11 +292,11 @@
 	    function onSuccess(acceleration) {
 	    
 	    	// Esto es para medir el tiempo del test,20 seg.
-			setTimeout("stopWatch()",20000);
+			setTimeout("stopWatch()",parseInt(duracion));
 
 	        var element = document.getElementById('accelerometer');
 	        element.innerHTML = '<div class="showAcceleration"><center><h1>Aceleracion</h1>' +
-	        					'<h3>Debes mantener la posicion por 20 segundos</h3><br>'+
+	        					'<h3>Debes mantener la posicion por '+duracion/1000+' segundos</h3><br>'+
 	        					'X :   ' + acceleration.x + '<br><br>' +
 	                            ' Y :   ' + acceleration.y + '<br><br>' +
 	                            ' Z :   ' + acceleration.z + '<br><br>' +
