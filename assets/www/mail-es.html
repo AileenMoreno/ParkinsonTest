@@ -30,8 +30,14 @@
 		var pxs = new Array();
 		var pys = new Array();
 		var pzs = new Array();
-		
-		var htmlstring = '';
+		//Para escribir en archivo
+		var writeX= new Array();
+		var writeY= new Array();
+		var writeZ= new Array();		
+		var writeFecha = ' ';
+		var tipoEscritura = 0;
+		var puntaje = 0;
+		var titulo =' ';
 	    
 		
 		function iniciar(){
@@ -56,15 +62,58 @@
 		
 		
 		function gotFileWriter(writer) {
-		   var len   = acc_x.length;
-		   var data = 'Parkinson-Test\nResultado prueba general \n Valores(x,y,z) \n'; 
+		   var len   = writeX.length;
+		   var data = ' ';
+		   
+		   // Encabezado del attach (dentro del doc)
+		   if(tipoEscritura == 1){
+				data = 'Parkinson-Test\nResultado prueba general \n Valores(x,y,z) \n'; 
+				titulo = ' Resultados prueba de temblor general ';
+		   }else if(tipoEscritura == 3){
+				data = 'Parkinson-Test\nResultado prueba de brazos al frente \n Valores(x,y,z) \n'; 		   
+				titulo = ' Resultados prueba temblor de brazos al frente  ';				
+		   }else  if(tipoEscritura == 2){
+				data = 'Parkinson-Test\nResultado prueba de brazos flexionados \n Valores(x,y,z) \n'; 		   
+				titulo = ' Resultados prueba temblor de brazos flexionados  ';				
+		   }else if(tipoEscritura == 4){
+				data = 'Parkinson-Test\nResultado prueba de precision \nPuntaje \n'; 
+				titulo = ' Resultados prueba precision ';				
+		   }else if(tipoEscritura == 5){
+				data = 'Parkinson-Test\nResultado prueba de rapidez \nPuntaje \n'; 		
+				titulo = ' Resultados prueba de rapidez ';				
+		   } 
+		   
+		   
+			   // Escribir documento del tipo X,Y,Z
+			   if((tipoEscritura == 1)||(tipoEscritura == 2)||(tipoEscritura == 3)) {
+			   
+					var i = 0;
+					for (i = 0;i<len;i++){
+						data = data + '' + writeX[i]+','+writeY[i]+','+writeZ[i]+';\n';
+					}	
 
-	    	var i = 0;
-	    	for (i = 0;i<len;i++){
-	    		data = data + '' + acc_x[i]+','+acc_y[i]+','+acc_z[i]+';\n';
-	    	}	
-		   writer.write(data);
+			   }else{
+				data  = data + puntaje+';\n';		
+			   }
+			  writer.write(data);	   
+			  
+			  
+			  enviarMail();
      	}
+		
+		
+		
+		function enviarMail(){	
+			var email='proyectoparkinson@gmail.com';
+			var subject = 'ParkinsonTest-Resultados';
+			var cc = 'aileengmp@gmail.com';
+			var body = titulo +' \n Date: '+writeFecha;
+			var mailto_link = 'mailto:' + email+'?subject=ParkinsonTest&cc='+cc+'&body=see attachment&attachment="resultsParkinsonTest.txt'
+			var attach = new Array();
+			attach.push("/sdcard/resultsParkinsonTest.txt");
+			window.plugins.emailComposer.showEmailComposer(subject,body,email,cc,cc,cc,attach);				
+
+		}
 		
 	    function fail(error) {
 	        console.log(error.code);
@@ -88,14 +137,13 @@
 		
 		function query2DB(tx){
 			var idMed = ids[selected_index];
+			tipoEscritura = tipos[selected_index];
 			// En este caso no hay que buscar los valores
-			if ( (tipos[selected_index]==4) || (tipos[selected_index]==5) ){
-				var email='proyectoparkinson@gmail.com';
-				var subject = 'ParkinsonTest-Results';
-				var cc = 'aileengmp@gmail.com';
-				var body = 'Resultados de examen%0D%0A-Fecha: '+idMed+'%0D%0A-Puntaje:'+pxs[selected_index];
-				var mailto_link = 'mailto:' + email+'?subject=ParkinsonTest&cc='+cc+'&body=' +body;
-				window.location= mailto_link;
+			if ( (tipos[selected_index]==4) || (tipos[selected_index]==5)){
+				puntaje = pxs[selected_index];
+				writeFecha = fechas[selected_index];
+				// Inicia el proceso de escritura
+				window.requestFileSystem(LocalFileSystem.PERSISTENT, 0, gotFS, fail);						
 			}else{
 				
 				tx.executeSql('SELECT * FROM VALORES WHERE id_medicion="'+ idMed+ '"',[],renderList,errorDB);
@@ -112,15 +160,14 @@
 	    	
 	    	for (i = 0;i<len;i++){
 	    		htmlstring += '%0D%0AX:' + results.rows.item(i).x + '%0D%0AY:' + results.rows.item(i).y+'%0D%0AZ:' + results.rows.item(i).z + '%0D%0A%0D%0A ';
+				writeX.push(results.rows.item(i).x );
+				writeY.push(results.rows.item(i).y );
+				writeZ.push(results.rows.item(i).z );	
 	    	}
-	    
-	    	var email='proyectoparkinson@gmail.com';
-			var subject = 'ParkinsonTest-Results';
-			var cc = 'aileengmp@gmail.com';
-			var body = 'Resultados  %0D%0A-Fecha: '+ids[selected_index]+'%0D%0A-Promedio x:'+pxs[selected_index]+'%0D%0A%0D%0A-Promedio y:'+pys[selected_index]+'%0D%0A%0D%0A -Promedio z:'+pzs[selected_index]+'%0D%0A %0D%0A-Valores: %0D%0A'+htmlstring;
-			var mailto_link = 'mailto:' + email+'?subject=ParkinsonTest&cc='+cc+'&body=' +body;
-			window.location= mailto_link;
-	    	
+			
+			// Inicia el proceso de escritura
+			window.requestFileSystem(LocalFileSystem.PERSISTENT, 0, gotFS, fail);				
+    	
 	    }
 
 		function renderList2(tx,results){
