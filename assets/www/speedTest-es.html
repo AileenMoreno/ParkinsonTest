@@ -3,6 +3,7 @@
   <head>
     <title>Acceleration Example</title>
     <link rel="stylesheet" type="text/css" href="css/speedTestDesign.css" media="screen" />
+   <meta name="viewport" content="width=device-width, user-scalable=no">	
     <script type="text/javascript" charset="utf-8" src="cordova.js"></script>
 	<script type="text/javascript" charset="utf-8" src="email_composer.js"></script>
     <script type="text/javascript" charset="utf-8">
@@ -57,7 +58,7 @@
 	    function showOne(){
 	    	var element = document.getElementById('empty');	    
 	        element.innerHTML = '<center>' +
-					'<br><br><br><img src="images/one.png"></img>'+'</center><br><br>';    
+					'<br><br><br><img src="images/three.png"></img>'+'</center><br><br>';    
 			// Esto es para medir el tiempo del test,5 seg.
 			setTimeout("showTwo()",1000);  	    
 	    
@@ -68,16 +69,16 @@
 	        element.innerHTML = '<center>' +
 					'<br><br><br><img src="images/two.png"></img>'+'</center><br><br>';     
 			// Esto es para medir el tiempo del test,5 seg.
-			setTimeout("showThree()",1000);  	    
+			setTimeout("showThree()",2000);  	    
 	    
 	    }
 	    
 	    function showThree(){
 	    	var element = document.getElementById('empty');		    
 	        element.innerHTML = '<center>' +
-					'<br><br><br><img src="images/three.png"></img>'+'</center><br><br>'; 	    
+					'<br><br><br><img src="images/one.png"></img>'+'</center><br><br>'; 	    
 			// Esto es para medir el tiempo del test,5 seg.
-			setTimeout("showGo()",1000);  	    
+			setTimeout("showGo()",2000);  	    
 	    
 	    }		 
 
@@ -212,6 +213,7 @@
 		function presser(){
 		
 			countPress = countPress + 1;
+			console.log(countPress);
 		}
 		
 		// Muestra un cuadro de confirmación personalizado
