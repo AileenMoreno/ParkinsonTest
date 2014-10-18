@@ -14,8 +14,40 @@
 		    document.addEventListener("deviceready", onDeviceReady, false);
 	
 		   function onDeviceReady() {
-		    navigator.splashscreen.show();
+		   		//iniciamos la bd
+				var db = window.openDatabase("Database","1.0 ","Cordova demo",30*1024*1024);
+				db.transaction(createDB,errorDB,successDB);
+		   
+		    	navigator.splashscreen.show();
 		    }
+		    
+		    function createDB(tx){
+		    	tx.executeSql('CREATE TABLE IF NOT EXISTS TIEMPO(valorTiempo,tipoTiempo)');
+		    	var sql ;
+		    
+		    	
+		    	// Insertamos tiempo que dura cada medicion por DEFECTO
+		    	sql= 'INSERT INTO TIEMPO(valorTiempo,tipoTiempo) VALUES (?,?)';
+		    	tx.executeSql(sql,["15000","1"],successQueryDB1,errorDB);
+		    	
+		    	// Insertamos tiempo entre muestras por DEFECTO
+		    	sql= 'INSERT INTO TIEMPO(valorTiempo,tipoTiempo) VALUES (?,?)';
+		    	tx.executeSql(sql,["300","2"],successQueryDB2,errorDB);
+	    	} 
+		    
+		    function successQueryDB1(tx){
+		  		console.log("Actualizado tiempo de duracion por defecto!");
+		    }
+		    function successQueryDB2(tx){
+		  		console.log("Actualizado tiempo entre mediciones por defecto!");
+		    }
+		    
+		    function errorDB(err){
+				alert('Error processing SQL: '+err.code);
+			}
+			
+			function successDB(){
+			}
 		    
 		</script>
 	</head>

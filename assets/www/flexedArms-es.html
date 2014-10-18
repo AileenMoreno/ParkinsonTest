@@ -34,6 +34,11 @@
 		var frecuencia;
 		var duracion;
 		
+		// Audio player
+        //
+        var my_media = null;
+        var mediaTimer = null;
+		
 		 // Wait for PhoneGap to load
 	    //
 	    document.addEventListener("deviceready", onDeviceReady, false);
@@ -54,7 +59,8 @@
 	   		prom_z = sum_z / len;
 	   }
 
-
+		function successDB(){
+			}
 	   function onDeviceReady(){
 			var start = document.getElementById("buttonStart");
 			
@@ -62,9 +68,13 @@
 			//iniciamos la bd
 			db = window.openDatabase("Database","1.0 ","Cordova demo",2*1024*1024);
 			db.transaction(createDB,errorDB,successDB);
+			
 	    	
 	    }
 	    
+
+	    
+	
 	    
 	    function createDB(tx){
 	    	tx.executeSql('CREATE TABLE IF NOT EXISTS MEDICION(id unique,fecha,tipo,px,py,pz)');
@@ -102,8 +112,7 @@
 	        console.log(error.code);
 	    }
 	    
-		function successDB(){
-		}
+		
 		
 		
 	    function startTest(){
@@ -183,6 +192,10 @@
 			
 	    	// Esto es para medir el tiempo del test
 			setTimeout("verAcc()",1000);
+			
+			my_media = new Media('sounds/beep-08b.mp3', onSuccess, onError);
+
+          
 	    	
 	    }
 	    
@@ -361,6 +374,7 @@
 	</div>
 	
 	<div class="testMenu">
+		
 		<center>
 			<div class="testInstruction" id="testInstruction">
 				<div class="subtitle"><br><center>Brazos flexionados</center><br></div>

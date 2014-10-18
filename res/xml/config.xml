@@ -104,7 +104,7 @@
     <feature name="EmailComposer">
        <param name="android-package" value="com.example.parkinsontest.EmailComposer" />
 	</feature>
-    
+
     
     <!-- Deprecated plugins element. Remove in 3.0 -->
     
