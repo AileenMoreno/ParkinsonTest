@@ -72,7 +72,7 @@
 		    	
 		    	// obtenemos el valor del tiempo nuevo
 		    	time1= document.getElementById("tiempo1").value;
-		    	
+		    	console.log("TIEMPO 1-------------"+time1+"\n");
 		    	// Eliminamos ROWS de tiempo de tipo 1
 		    	var t="1";
 		    	tx.executeSql('DELETE FROM TIEMPO WHERE tipoTiempo=?', [t], deleteSuccess, errorNOTFIND);
@@ -82,7 +82,7 @@
 		    	tx.executeSql(sql,[time1,"1"],successQueryDB2,errorDB);
 		    	
 		    	//Textbox vacio
-		    	document.getElementById("tiempo1").value="";
+		    	//document.getElementById("tiempo1").value="";
 		    	
 		    }
 		    
@@ -104,7 +104,7 @@
 		    	
 		    	// obtenemos el valor del tiempo nuevo
 		    	time2= document.getElementById("tiempo2").value;
-		    	
+		    	console.log("TIEMPO 2-------------"+time2+"\n");
 		    	// Eliminamos ROWS de tiempo de tipo 2
 		    	var t="2";
 		    	tx.executeSql('DELETE FROM TIEMPO WHERE tipoTiempo=?', [t], deleteSuccess2, errorNOTFIND);
@@ -113,7 +113,7 @@
 		    	sql= 'INSERT INTO TIEMPO(valorTiempo,tipoTiempo) VALUES (?,?)';
 		    	tx.executeSql(sql,[time2,t],successQueryDB3,errorDB);
 		    	
-		    	document.getElementById("tiempo2").value="";
+		    	//document.getElementById("tiempo2").value="";
 		    	
 		    }
 		    

@@ -213,7 +213,7 @@
 	    	var i;	
 	    	var len = results.rows.length;
 	    	console.log("Rows Affected search TIEMPO = " + len);
-	    	for (i = 0;i<len;i++){
+	    	for (i = 0;i<2;i++){
 	    		tipo=results.rows.item(i).tipoTiempo;
 	    		valor = results.rows.item(i).valorTiempo;
 	    		if (tipo==2){
@@ -256,9 +256,9 @@
 	        var element = document.getElementById('empty');
 	        element.innerHTML = '<div class="showAcceleration"><center><h1>Aceleracion</h1>' +
 	        					'<h3>Debes mantener la posicion por '+parseInt(duracion)/1000+' segundos</h3><br>'+
-	        					'X :   ' + acceleration.x + '<br><br>' +
-	                            ' Y :   ' + acceleration.y + '<br><br>' +
-	                            ' Z :   ' + acceleration.z + '<br><br>' +
+	        					//'X :   ' + acceleration.x + '<br><br>' +
+	                           // ' Y :   ' + acceleration.y + '<br><br>' +
+	                           // ' Z :   ' + acceleration.z + '<br><br>' +
 	                            '</center></div>';
 	       acc_x.push(acceleration.x);
 			acc_y.push(acceleration.y);
